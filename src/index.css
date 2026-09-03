@@ -1,0 +1,464 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================
+   DIGIKIDZ — Premium Glassmorphism Design System
+   ============================================================ */
+
+@layer base {
+  :root {
+    /* ── Core Background ── */
+    --background: #f7f9fb;
+    --on-background: #191c1e;
+    --foreground: 222 47% 11%;
+
+    /* ── Card / Surface ── */
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+
+    /* ── Primary ── */
+    --primary: #004ac6;
+    --on-primary: #ffffff;
+    --primary-foreground: 210 40% 98%;
+    --primary-container: #2563eb;
+    --on-primary-container: #eeefff;
+
+    /* ── Secondary ── */
+    --secondary: #9d4300;
+    --on-secondary: #ffffff;
+    --secondary-foreground: 222 47% 11%;
+    --secondary-container: #fd761a;
+    --on-secondary-container: #5c2400;
+
+    /* ── Tertiary ── */
+    --tertiary: #006229;
+    --on-tertiary: #ffffff;
+    --tertiary-container: #007e37;
+    --on-tertiary-container: #c1ffc5;
+
+    /* ── Surface Tokens ── */
+    --surface: #f7f9fb;
+    --surface-dim: #d8dadc;
+    --surface-bright: #f7f9fb;
+    --surface-container-lowest: #ffffff;
+    --surface-container-low: #f2f4f6;
+    --surface-container: #eceef0;
+    --surface-container-high: #e6e8ea;
+    --surface-container-highest: #e0e3e5;
+    --on-surface: #191c1e;
+    --on-surface-variant: #434655;
+    --inverse-surface: #2d3133;
+    --inverse-on-surface: #eff1f3;
+    --surface-tint: #0053db;
+    --surface-variant: #e0e3e5;
+
+    /* ── Outline & State ── */
+    --outline: #737686;
+    --outline-variant: #c3c6d7;
+    --error: #ba1a1a;
+    --on-error: #ffffff;
+    --error-container: #ffdad6;
+    --on-error-container: #93000a;
+    
+    /* ── Fixed Colors ── */
+    --primary-fixed: #dbe1ff;
+    --primary-fixed-dim: #b4c5ff;
+    --on-primary-fixed: #00174b;
+    --on-primary-fixed-variant: #003ea8;
+    --secondary-fixed: #ffdbca;
+    --secondary-fixed-dim: #ffb690;
+    --on-secondary-fixed: #341100;
+    --on-secondary-fixed-variant: #783200;
+    --tertiary-fixed: #6bff8f;
+    --tertiary-fixed-dim: #4ae176;
+    --on-tertiary-fixed: #002109;
+    --on-tertiary-fixed-variant: #005321;
+
+    /* ── Others ── */
+    --muted: 214 32% 91%;
+    --muted-foreground: 215 16% 47%;
+    --accent: 38 92% 50%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 221 83% 53%;
+    --radius: 1rem;
+
+    /* ── Coach Colors ── */
+    --coach-bani: 221 83% 53%;
+    --coach-argy: 262 83% 58%;
+    --coach-zaura: 340 82% 52%;
+
+    /* ── Level Colors ── */
+    --level-little-creator: 262 83% 58%;
+    --level-junior: 38 92% 50%;
+    --level-teenager: 340 82% 52%;
+    --level-trial: 142 71% 45%;
+
+    /* ── Sidebar ── */
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 222 47% 11%;
+    --sidebar-primary: 221 83% 53%;
+    --sidebar-primary-foreground: 210 40% 98%;
+    --sidebar-accent: 214 32% 91%;
+    --sidebar-accent-foreground: 222 47% 11%;
+    --sidebar-border: 214 32% 91%;
+    --sidebar-ring: 221 83% 53%;
+  }
+
+  .dark {
+    /* Retaining dark mode fallbacks for shadcn */
+    --background: 222 47% 11%;
+    --foreground: 210 40% 98%;
+    --card: 222 47% 15%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222 47% 15%;
+    --popover-foreground: 210 40% 98%;
+    --primary-foreground: 222 47% 11%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217 33% 20%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 38 92% 50%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217 33% 20%;
+    --input: 217 33% 20%;
+    --ring: 224 76% 48%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-on-background antialiased;
+    font-family: 'Inter', sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Inter', sans-serif;
+  }
+}
+
+@layer components {
+  /* ============================================================
+     GLASSMORPHISM & AI SAAS UTILITIES
+     ============================================================ */
+  .glass-panel {
+    background: rgba(255, 255, 255, 0.82);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    box-shadow: 0 4px 20px -2px rgba(0, 74, 198, 0.05);
+  }
+  
+  .glass-modal {
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(32px);
+    -webkit-backdrop-filter: blur(32px);
+    box-shadow: 0 24px 60px -12px rgba(0, 74, 198, 0.12);
+  }
+
+  .ambient-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.35;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  /* ── AI SaaS Glow & Gradient Borders ── */
+  .ai-card {
+    @apply relative bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 rounded-2xl shadow-sm transition-all duration-300;
+  }
+
+  .ai-card:hover {
+    @apply shadow-md -translate-y-[1px];
+    border-color: rgba(0, 74, 198, 0.3);
+  }
+
+  .dark .ai-card:hover {
+    border-color: rgba(0, 74, 198, 0.4);
+  }
+
+  .ai-card-glow {
+    position: relative;
+  }
+
+  .ai-card-glow::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.25), rgba(147, 51, 234, 0.1), transparent 70%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  .ai-badge {
+    @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold tracking-tight border bg-primary/5 text-primary border-primary/20 backdrop-blur-sm;
+  }
+
+  .ai-badge-subtle {
+    @apply inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[11px] font-medium tracking-tight bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200/60 dark:border-slate-700/60;
+  }
+}
+
+@layer components {
+
+  /* ── Schedule Cells ── */
+  .schedule-cell {
+    @apply min-h-[85px] p-2 border-r border-b border-border/70 transition-all duration-200 bg-transparent;
+  }
+
+  .schedule-cell:hover {
+    @apply bg-slate-50/80 dark:bg-slate-800/40;
+  }
+
+  .schedule-entry {
+    @apply rounded-xl p-2.5 mb-1.5 text-sm shadow-sm border transition-all duration-200 cursor-pointer;
+  }
+
+  .schedule-entry:hover {
+    @apply shadow-md transform -translate-y-[1px];
+  }
+
+  /* ── Coach Colors ── */
+  .coach-bani {
+    @apply bg-blue-50/90 border border-blue-200/80 border-l-4 border-l-blue-600 text-blue-950 dark:bg-blue-950/20 dark:border-blue-800/60 dark:border-l-blue-500 dark:text-blue-100;
+  }
+
+  .coach-argy {
+    @apply bg-purple-50/90 border border-purple-200/80 border-l-4 border-l-purple-600 text-purple-950 dark:bg-purple-950/20 dark:border-purple-800/60 dark:border-l-purple-500 dark:text-purple-100;
+  }
+
+  .coach-zaura {
+    @apply bg-rose-50/90 border border-rose-200/80 border-l-4 border-l-rose-600 text-rose-950 dark:bg-rose-950/20 dark:border-rose-800/60 dark:border-l-rose-500 dark:text-rose-100;
+  }
+  .coach-nay {
+    @apply bg-teal-50/90 border border-teal-200/80 border-l-4 border-l-teal-600 text-teal-950 dark:bg-teal-950/20 dark:border-teal-800/60 dark:border-l-teal-500 dark:text-teal-100;
+  }
+  .coach-nurul {
+    @apply bg-cyan-50/90 border border-cyan-200/80 border-l-4 border-l-cyan-600 text-cyan-950 dark:bg-cyan-950/20 dark:border-cyan-800/60 dark:border-l-cyan-500 dark:text-cyan-100;
+  }
+  /* ── Grid Headers ── */
+  .day-header {
+    @apply text-center py-3 font-bold text-xs uppercase tracking-wider text-slate-700 dark:text-slate-300 bg-slate-50/80 dark:bg-slate-900/50;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .time-slot {
+    @apply text-xs font-semibold py-4 px-2 text-center text-slate-500 dark:text-slate-400 bg-slate-50/60 dark:bg-slate-800/30;
+    font-family: 'Inter', sans-serif;
+  }
+
+  /* ── Level Badges ── */
+  .level-badge {
+    @apply text-[11px] px-2.5 py-0.5 rounded-md font-semibold border;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .level-little-creator {
+    @apply bg-purple-50/90 text-purple-700 border-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-800;
+  }
+
+  .level-junior {
+    @apply bg-sky-50/90 text-sky-700 border-sky-200 dark:bg-sky-900/30 dark:text-sky-300 dark:border-sky-800;
+  }
+
+  .level-teenager {
+    @apply bg-amber-50/90 text-amber-800 border-amber-200 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-800;
+  }
+
+  .level-trial {
+    @apply bg-emerald-50/90 text-emerald-700 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-300 dark:border-emerald-800;
+  }
+
+  /* ── Clean Card (Professional) ── */
+  .glass-card {
+    @apply bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl shadow-sm transition-all duration-300;
+  }
+
+  .glass-card:hover {
+    @apply shadow-md border-slate-300 dark:border-slate-700;
+  }
+
+  .glass-amber {
+    @apply bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 shadow-sm dark:from-amber-950/30 dark:to-orange-950/30 dark:border-amber-900;
+  }
+
+  /* ── Pulse animations ── */
+  .pulse-subtle {
+    animation: pulse-subtle 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  @keyframes pulse-subtle {
+    0%,
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.85;
+      transform: scale(1.02);
+    }
+  }
+}
+
+/* ============================================================
+   MARQUEE
+   ============================================================ */
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  display: inline-block;
+  animation: marquee 30s linear infinite;
+  will-change: transform;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+/* ============================================================
+   FADE IN
+   ============================================================ */
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* ============================================================
+   CUSTOM SCROLLBAR
+   ============================================================ */
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  /* slate-300 */
+  border-radius: 4px;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #475569;
+  /* slate-600 */
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+  /* slate-400 */
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+  /* slate-500 */
+}
+
+/* ============================================================
+   SELECTION COLOR
+   ============================================================ */
+
+::selection {
+  background: #dbeafe;
+  /* blue-100 */
+  color: #1e3a8a;
+  /* blue-900 */
+}
+
+.dark ::selection {
+  background: #1e3a8a;
+  /* blue-900 */
+  color: #eff6ff;
+  /* blue-50 */
+}
+
+/* ============================================================
+   MATERIAL SYMBOLS & INTERACTIVITY UTILITIES
+   ============================================================ */
+
+/* Material Symbols base */
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  font-size: 24px;
+  line-height: 1;
+  vertical-align: middle;
+}
+
+/* Shimmer skeleton */
+@keyframes shimmer {
+  0% { background-position: -1000px 0; }
+  100% { background-position: 1000px 0; }
+}
+.skeleton-shimmer {
+  background: linear-gradient(90deg, #f0f0f0 0%, #f8f8f8 50%, #f0f0f0 100%);
+  background-size: 1000px 100%;
+  animation: shimmer 2s infinite linear;
+}
+
+/* Slide up entrance */
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-slide-up { animation: slide-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+/* Scale in */
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+.animate-scale-in { animation: scale-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+/* Safe area for iPhone notch */
+.safe-area-bottom { padding-bottom: env(safe-area-inset-bottom, 0px); }
+.safe-area-top { padding-top: env(safe-area-inset-top, 0px); }
+
+/* Smooth scroll */
+html { scroll-behavior: smooth; }
+
+/* Card hover lift */
+.card-hover { transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease; }
+.card-hover:hover { transform: translateY(-2px); }
