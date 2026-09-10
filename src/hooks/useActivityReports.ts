@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useRealtimeRefetch } from './useRealtimeRefetch';
 
 export interface ActivityReport {
   id: string;
@@ -115,23 +116,13 @@ export function useActivityReports(studentName?: string, accessCode?: string) {
 
   useEffect(() => {
     fetchReports();
+  }, [fetchReports]);
 
-    // Realtime subscription — mirip dengan useSchedule
-    const channel = supabase
-      .channel(`activity-reports-realtime${studentName ? `-${studentName}` : ''}`)
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'activity_reports' },
-        () => {
-          fetchReports();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [fetchReports, studentName, accessCode]);
+  useRealtimeRefetch(
+    'activity_reports',
+    fetchReports,
+    studentName || accessCode || 'all',
+  );
 
   const addReport = useCallback(async (report: Omit<ActivityReport, 'id' | 'createdAt'>) => {
     let activityText = report.activityReportText || '';

@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useRealtimeRefetch } from './useRealtimeRefetch';
 
 export interface HolidayBanner {
   id: string;
@@ -60,6 +61,8 @@ export function useHolidayBanners() {
   useEffect(() => {
     fetchBanners();
   }, [fetchBanners]);
+
+  useRealtimeRefetch('holiday_banners', fetchBanners);
 
   const addBanner = useCallback(async (
     banner: Omit<HolidayBanner, 'id' | 'createdAt'>

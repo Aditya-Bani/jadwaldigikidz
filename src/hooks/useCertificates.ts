@@ -1,6 +1,7 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from './use-toast';
+import { useRealtimeRefetch } from './useRealtimeRefetch';
 
 export interface StudentCertificate {
   id: string;
@@ -14,10 +15,12 @@ export function useCertificates(studentName?: string | null) {
   const [certificates, setCertificates] = useState<StudentCertificate[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  // Loading spinner only for the first load; realtime refetches stay silent.
+  const initialised = useRef(false);
 
   const fetchCertificates = useCallback(async () => {
     try {
-      setLoading(true);
+      if (!initialised.current) setLoading(true);
       let query = supabase
         .from('student_certificates')
         .select('*')
@@ -50,6 +53,7 @@ export function useCertificates(studentName?: string | null) {
         variant: 'destructive',
       });
     } finally {
+      initialised.current = true;
       setLoading(false);
     }
   }, [studentName, toast]);
@@ -57,6 +61,8 @@ export function useCertificates(studentName?: string | null) {
   useEffect(() => {
     fetchCertificates();
   }, [fetchCertificates]);
+
+  useRealtimeRefetch('student_certificates', fetchCertificates, studentName || 'all');
 
   const addCertificate = async (cert: Omit<StudentCertificate, 'id' | 'createdAt'>) => {
     try {

@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useRealtimeRefetch } from './useRealtimeRefetch';
 
 export interface AdminNotification {
   id: string;
@@ -59,6 +60,8 @@ export function useNotifications() {
   useEffect(() => {
     fetchNotifications();
   }, [fetchNotifications]);
+
+  useRealtimeRefetch('admin_notifications', fetchNotifications);
 
   const addNotification = useCallback(async (message: string) => {
     const { data, error } = await supabase

@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { ScheduleEntry, DayOfWeek, TimeSlot, Coach, StudentLevel } from '@/types/schedule';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useRealtimeRefetch } from './useRealtimeRefetch';
 
 interface DbScheduleEntry {
   id: string;
@@ -127,22 +128,9 @@ export function useSchedule() {
 
   useEffect(() => {
     fetchSchedule();
-
-    const channel = supabase
-      .channel('schedule-realtime')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'schedule_entries' },
-        () => {
-          fetchSchedule();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
   }, [fetchSchedule]);
+
+  useRealtimeRefetch('schedule_entries', fetchSchedule);
 
   const addEntry = useCallback(async (entry: Omit<ScheduleEntry, 'id'>) => {
     let finalNotes = entry.notes || '';
