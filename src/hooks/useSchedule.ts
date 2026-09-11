@@ -132,7 +132,7 @@ export function useSchedule() {
 
   useRealtimeRefetch('schedule_entries', fetchSchedule);
 
-  const addEntry = useCallback(async (entry: Omit<ScheduleEntry, 'id'>) => {
+  const addEntry = useCallback(async (entry: Omit<ScheduleEntry, 'id'>): Promise<boolean> => {
     let finalNotes = entry.notes || '';
     if (entry.status === 'inactive') {
       const tag = entry.inactiveReason ? `[INACTIVE:${entry.inactiveReason}]` : '[INACTIVE]';
@@ -187,23 +187,24 @@ export function useSchedule() {
         if (retryError) {
           console.error('Error adding entry (retry):', retryError);
           toast({ title: 'Error', description: `Gagal menambahkan jadwal: ${retryError.message}`, variant: 'destructive' });
-          return;
+          return false;
         }
         setSchedule((prev) => [...prev, dbToApp({ ...retryData, updated_by: entry.updatedBy ?? null } as DbScheduleEntry)]);
-        return;
+        return true;
       }
 
       console.error('Error adding entry:', error);
       toast({ title: 'Error', description: `Gagal menambahkan jadwal: ${error.message}`, variant: 'destructive' });
-      return;
+      return false;
     }
 
     setSchedule((prev) => [...prev, dbToApp(data as DbScheduleEntry)]);
+    return true;
   }, [toast]);
 
-  const updateEntry = useCallback(async (id: string, updates: Partial<Omit<ScheduleEntry, 'id'>>) => {
+  const updateEntry = useCallback(async (id: string, updates: Partial<Omit<ScheduleEntry, 'id'>>): Promise<boolean> => {
     const existingEntry = schedule.find(e => e.id === id);
-    if (!existingEntry) return;
+    if (!existingEntry) return false;
 
     const dbUpdates: Record<string, unknown> = {};
     if (updates.studentName !== undefined) dbUpdates.student_name = updates.studentName;
@@ -269,25 +270,26 @@ export function useSchedule() {
         if (retryError) {
           console.error('Error updating entry (retry):', retryError);
           toast({ title: 'Error', description: 'Gagal memperbarui jadwal.', variant: 'destructive' });
-          return;
+          return false;
         }
         setSchedule((prev) =>
           prev.map((entry) => (entry.id === id ? dbToApp({ ...retryData, updated_by: updates.updatedBy ?? null } as DbScheduleEntry) : entry))
         );
-        return;
+        return true;
       }
 
       console.error('Error updating entry:', error);
       toast({ title: 'Error', description: 'Gagal memperbarui jadwal.', variant: 'destructive' });
-      return;
+      return false;
     }
 
     setSchedule((prev) =>
       prev.map((entry) => (entry.id === id ? dbToApp(data as DbScheduleEntry) : entry))
     );
+    return true;
   }, [toast, schedule]);
 
-  const deleteEntry = useCallback(async (id: string) => {
+  const deleteEntry = useCallback(async (id: string): Promise<boolean> => {
     const { error } = await supabase
       .from('schedule_entries')
       .delete()
@@ -300,10 +302,11 @@ export function useSchedule() {
         description: 'Gagal menghapus jadwal.',
         variant: 'destructive',
       });
-      return;
+      return false;
     }
 
     setSchedule((prev) => prev.filter((entry) => entry.id !== id));
+    return true;
   }, [toast]);
 
   const getEntriesForCell = useCallback(

@@ -13,6 +13,7 @@ interface ScheduleGridProps {
   onEditEntry: (entry: ScheduleEntry) => void;
   onDeleteEntry: (id: string) => void;
   onAttendanceEntry: (entry: ScheduleEntry) => void;
+  onToggleActive: (entry: ScheduleEntry) => void;
   /** Attendance status for an entry's current session date, when recorded. */
   getAttendanceStatus?: (entry: ScheduleEntry) => AttendanceStatus | undefined;
   hasActiveFilter?: boolean;
@@ -22,7 +23,7 @@ interface ScheduleGridProps {
 
 /* ─── DESKTOP GRID VIEW ───────────────────────────────────────────────────── */
 
-function DesktopGrid({ getEntriesForCell, onAddEntry, onEditEntry, onDeleteEntry, onAttendanceEntry, getAttendanceStatus, hasActiveFilter }: ScheduleGridProps) {
+function DesktopGrid({ getEntriesForCell, onAddEntry, onEditEntry, onDeleteEntry, onAttendanceEntry, onToggleActive, getAttendanceStatus, hasActiveFilter }: ScheduleGridProps) {
   const JS_DAY_MAP: Record<number, DayOfWeek> = { 1: 'senin', 2: 'selasa', 3: 'rabu', 4: 'kamis', 5: 'jumat', 6: 'sabtu', 0: 'minggu' };
   const todayKey = JS_DAY_MAP[new Date().getDay()];
 
@@ -85,6 +86,7 @@ function DesktopGrid({ getEntriesForCell, onAddEntry, onEditEntry, onDeleteEntry
                       onEdit={onEditEntry}
                       onDelete={onDeleteEntry}
                       onAttendance={onAttendanceEntry}
+                      onToggleActive={onToggleActive}
                       attendanceStatus={getAttendanceStatus?.(entry)}
                     />
                   ))}
@@ -109,7 +111,7 @@ function DesktopGrid({ getEntriesForCell, onAddEntry, onEditEntry, onDeleteEntry
 
 /* ─── MOBILE LIST VIEW (per hari) ────────────────────────────────────────── */
 
-function MobileDayView({ day, getEntriesForCell, onAddEntry, onEditEntry, onDeleteEntry, onAttendanceEntry, getAttendanceStatus }: ScheduleGridProps & { day: DayOfWeek }) {
+function MobileDayView({ day, getEntriesForCell, onAddEntry, onEditEntry, onDeleteEntry, onAttendanceEntry, onToggleActive, getAttendanceStatus }: ScheduleGridProps & { day: DayOfWeek }) {
   const slotsWithEntries = TIME_SLOTS.map((time) => ({
     time,
     entries: getEntriesForCell(day, time),
@@ -133,6 +135,7 @@ function MobileDayView({ day, getEntriesForCell, onAddEntry, onEditEntry, onDele
                   onEdit={onEditEntry}
                   onDelete={onDeleteEntry}
                   onAttendance={onAttendanceEntry}
+                  onToggleActive={onToggleActive}
                   attendanceStatus={getAttendanceStatus?.(entry)}
                 />
               ))
@@ -156,7 +159,7 @@ function MobileDayView({ day, getEntriesForCell, onAddEntry, onEditEntry, onDele
   );
 }
 
-function MobileView({ getEntriesForCell, onAddEntry, onEditEntry, onDeleteEntry, onAttendanceEntry, getAttendanceStatus, hasActiveFilter }: ScheduleGridProps) {
+function MobileView({ getEntriesForCell, onAddEntry, onEditEntry, onDeleteEntry, onAttendanceEntry, onToggleActive, getAttendanceStatus, hasActiveFilter }: ScheduleGridProps) {
   // Map system day (0-6, 0 is Sun) to DAYS index (0-5)
   // 1 (Mon) -> 0, 2 (Tue) -> 1, ..., 6 (Sat) -> 5, 0 (Sun) -> 0
   const getTodayIndex = () => {
@@ -257,6 +260,7 @@ function MobileView({ getEntriesForCell, onAddEntry, onEditEntry, onDeleteEntry,
           onEditEntry={onEditEntry}
           onDeleteEntry={onDeleteEntry}
           onAttendanceEntry={onAttendanceEntry}
+          onToggleActive={onToggleActive}
           getAttendanceStatus={getAttendanceStatus}
         />
       )}

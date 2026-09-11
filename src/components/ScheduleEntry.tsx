@@ -9,6 +9,7 @@ interface ScheduleEntryProps {
   onEdit: (entry: ScheduleEntryType) => void;
   onDelete: (id: string) => void;
   onAttendance: (entry: ScheduleEntryType) => void;
+  onToggleActive: (entry: ScheduleEntryType) => void;
   /** Attendance already recorded for this entry's current session date. */
   attendanceStatus?: AttendanceStatus;
 }
@@ -21,7 +22,12 @@ function getLevelClass(level: string): string {
   return '';
 }
 
-export function ScheduleEntryCard({ entry, onEdit, onDelete, onAttendance, attendanceStatus }: ScheduleEntryProps) {
+/* Action buttons: solid tints with a border so they stay legible on the white
+   card instead of blending into it. Hover deepens the colour. */
+const ACTION_BASE =
+  'h-9 w-9 sm:h-8 sm:w-8 rounded-lg border shadow-xs transition-colors';
+
+export function ScheduleEntryCard({ entry, onEdit, onDelete, onAttendance, onToggleActive, attendanceStatus }: ScheduleEntryProps) {
   const coachClass =
     entry.coach === 'Mr. Bani'
       ? 'coach-bani'
@@ -33,15 +39,15 @@ export function ScheduleEntryCard({ entry, onEdit, onDelete, onAttendance, atten
             ? 'coach-nurul'
             : 'coach-zaura';
   const levelClass = getLevelClass(entry.level);
-  
+
   const isPending = entry.status === 'pending';
   const isInactive = entry.status === 'inactive' || (!entry.isActive && !isPending);
-  
-  const pendingClass = isPending 
-    ? (entry.isHolidayCamp 
-        ? 'border-dashed border-amber-400 dark:border-amber-500' 
-        : entry.isTrial 
-          ? 'border-dashed border-indigo-400 dark:border-indigo-500' 
+
+  const pendingClass = isPending
+    ? (entry.isHolidayCamp
+        ? 'border-dashed border-amber-400 dark:border-amber-500'
+        : entry.isTrial
+          ? 'border-dashed border-indigo-400 dark:border-indigo-500'
           : 'opacity-55 grayscale-[30%] border-dashed border-amber-300 dark:border-amber-700 bg-amber-50/10 dark:bg-amber-950/10')
     : '';
   const inactiveClass = isInactive ? 'opacity-40 grayscale hover:opacity-80 transition-opacity' : '';
@@ -57,8 +63,8 @@ export function ScheduleEntryCard({ entry, onEdit, onDelete, onAttendance, atten
             <div className="mb-2 flex flex-wrap">
               <div className={cn(
                 "inline-flex items-center gap-1.5 text-[9px] px-2 py-0.5 rounded-full font-bold shadow-xs uppercase tracking-wider",
-                isPending 
-                  ? (entry.isHolidayCamp ? "bg-amber-600 text-white" : entry.isTrial ? "bg-indigo-600 text-white" : "bg-amber-500 text-white") 
+                isPending
+                  ? (entry.isHolidayCamp ? "bg-amber-600 text-white" : entry.isTrial ? "bg-indigo-600 text-white" : "bg-amber-500 text-white")
                   : "bg-slate-500 text-white"
               )}>
                 <span className={cn(!entry.isHolidayCamp && !entry.isTrial && "opacity-80")}>{isPending ? "Pending" : "Nonaktif"}</span>
@@ -123,16 +129,20 @@ export function ScheduleEntryCard({ entry, onEdit, onDelete, onAttendance, atten
           )}
         </div>
 
-        <div className="flex flex-col gap-1.5 transition-opacity duration-200">
+        {/* Actions — opens a confirmation first for anything that changes data. */}
+        <div className="flex flex-col gap-1.5 shrink-0">
           <Button
-            variant="secondary"
+            variant="outline"
             size="icon"
             title="Catat Kehadiran"
+            aria-label="Catat kehadiran murid"
             className={cn(
-              "h-8 w-8 sm:h-7 sm:w-7 rounded-lg bg-background/80 backdrop-blur-sm shadow-sm border-none",
-              attendanceStatus === 'present' && "bg-emerald-500 text-white hover:bg-emerald-600",
-              attendanceStatus === 'absent' && "bg-rose-500 text-white hover:bg-rose-600",
-              !attendanceStatus && "hover:bg-sky-500 hover:text-white",
+              ACTION_BASE,
+              attendanceStatus === 'present'
+                ? 'border-emerald-600 bg-emerald-600 text-white hover:bg-emerald-700 hover:text-white'
+                : attendanceStatus === 'absent'
+                  ? 'border-rose-600 bg-rose-600 text-white hover:bg-rose-700 hover:text-white'
+                  : 'border-sky-300 bg-sky-50 text-sky-700 hover:bg-sky-600 hover:text-white dark:border-sky-800 dark:bg-sky-950/50 dark:text-sky-300',
             )}
             onClick={(e) => {
               e.stopPropagation();
@@ -140,50 +150,64 @@ export function ScheduleEntryCard({ entry, onEdit, onDelete, onAttendance, atten
             }}
           >
             {attendanceStatus === 'absent'
-              ? <CalendarX className="h-4 w-4 sm:h-3.5 sm:w-3.5" />
-              : <CalendarCheck className="h-4 w-4 sm:h-3.5 sm:w-3.5" />}
+              ? <CalendarX className="h-4 w-4" />
+              : <CalendarCheck className="h-4 w-4" />}
           </Button>
+
           <Button
-            variant="secondary"
+            variant="outline"
             size="icon"
-            title={entry.isActive ? "Nonaktifkan Murid" : "Aktifkan Murid"}
-            className={cn("h-8 w-8 sm:h-7 sm:w-7 rounded-lg bg-background/80 backdrop-blur-sm shadow-sm border-none hover:text-white", entry.isActive ? "hover:bg-amber-500" : "hover:bg-emerald-500 text-slate-400")}
+            title={entry.isActive ? 'Nonaktifkan murid' : 'Aktifkan murid'}
+            aria-label={entry.isActive ? 'Nonaktifkan murid' : 'Aktifkan murid'}
+            className={cn(
+              ACTION_BASE,
+              entry.isActive
+                ? 'border-amber-300 bg-amber-50 text-amber-700 hover:bg-amber-500 hover:text-white dark:border-amber-800 dark:bg-amber-950/50 dark:text-amber-300'
+                : 'border-emerald-300 bg-emerald-50 text-emerald-700 hover:bg-emerald-600 hover:text-white dark:border-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-300',
+            )}
             onClick={(e) => {
               e.stopPropagation();
-              onEdit({ ...entry, isActive: !entry.isActive });
+              onToggleActive(entry);
             }}
           >
-            <Power className="h-4 w-4 sm:h-3.5 sm:w-3.5" />
+            <Power className="h-4 w-4" />
           </Button>
+
           <Button
-            variant="secondary"
+            variant="outline"
             size="icon"
-            title="Edit Jadwal"
+            title="Edit jadwal"
             aria-label="Edit jadwal murid"
-            className="h-8 w-8 sm:h-7 sm:w-7 rounded-lg bg-background/80 backdrop-blur-sm shadow-sm border-none hover:bg-primary hover:text-white"
+            className={cn(
+              ACTION_BASE,
+              'border-primary/30 bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground',
+            )}
             onClick={(e) => {
               e.stopPropagation();
               onEdit(entry);
             }}
           >
-            <Pencil className="h-4 w-4 sm:h-3.5 sm:w-3.5" />
+            <Pencil className="h-4 w-4" />
           </Button>
+
           <Button
-            variant="secondary"
+            variant="outline"
             size="icon"
-            title="Hapus Jadwal"
+            title="Hapus jadwal"
             aria-label="Hapus jadwal murid"
-            className="h-8 w-8 sm:h-7 sm:w-7 rounded-lg bg-background/80 backdrop-blur-sm shadow-sm border-none hover:bg-destructive hover:text-white"
+            className={cn(
+              ACTION_BASE,
+              'border-destructive/30 bg-destructive/10 text-destructive hover:bg-destructive hover:text-destructive-foreground',
+            )}
             onClick={(e) => {
               e.stopPropagation();
               onDelete(entry.id);
             }}
           >
-            <Trash2 className="h-4 w-4 sm:h-3.5 sm:w-3.5" />
+            <Trash2 className="h-4 w-4" />
           </Button>
         </div>
       </div>
     </div>
   );
 }
-

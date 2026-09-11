@@ -5,6 +5,7 @@ import { useSchedule } from '@/hooks/useSchedule';
 import { ScheduleGrid } from '@/components/ScheduleGrid';
 import { ScheduleDialog } from '@/components/ScheduleDialog';
 import { DeleteConfirmDialog } from '@/components/DeleteConfirmDialog';
+import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { AttendanceDialog } from '@/components/AttendanceDialog';
 import { AttendanceHistoryPanel } from '@/components/AttendanceHistoryPanel';
 import { ScheduleEntry, DayOfWeek, TimeSlot, Coach, COACHES } from '@/types/schedule';
@@ -71,13 +72,25 @@ export default function CalendarPage() {
     setAttendanceDialogOpen(true);
   };
 
-  const handleAttendanceSubmit = async (data: {
+  /** Attendance is staged in the form, confirmed, then written. */
+  const [pendingAttendance, setPendingAttendance] = useState<{
+    status: AttendanceStatus;
+    reason?: string;
+    note?: string;
+    sessionDate: string;
+  } | null>(null);
+
+  const handleAttendanceSubmit = (data: {
     status: AttendanceStatus;
     reason?: string;
     note?: string;
     sessionDate: string;
   }) => {
-    if (!attendanceEntry) return;
+    setPendingAttendance(data);
+  };
+
+  const handleConfirmAttendance = async () => {
+    if (!attendanceEntry || !pendingAttendance) return;
     const ok = await markAttendance({
       scheduleEntryId: attendanceEntry.id,
       studentName: attendanceEntry.studentName,
@@ -85,20 +98,21 @@ export default function CalendarPage() {
       level: attendanceEntry.level,
       day: attendanceEntry.day,
       time: attendanceEntry.time,
-      sessionDate: data.sessionDate,
-      status: data.status,
-      reason: data.reason,
-      note: data.note,
+      sessionDate: pendingAttendance.sessionDate,
+      status: pendingAttendance.status,
+      reason: pendingAttendance.reason,
+      note: pendingAttendance.note,
       recordedBy: displayedCoachName,
     });
     if (ok) {
       toast({
-        title: data.status === 'absent' ? 'Tidak Hadir Dicatat' : 'Kehadiran Dicatat',
-        description: `${attendanceEntry.studentName} ${data.status === 'absent' ? 'tidak hadir' : 'hadir'}${data.reason ? ` - ${data.reason}` : ''}.`,
-        variant: data.status === 'absent' ? 'destructive' : 'default',
+        title: pendingAttendance.status === 'absent' ? 'Tidak Hadir Dicatat' : 'Kehadiran Dicatat',
+        description: `${attendanceEntry.studentName} ${pendingAttendance.status === 'absent' ? 'tidak hadir' : 'hadir'}${pendingAttendance.reason ? ` - ${pendingAttendance.reason}` : ''}.`,
+        variant: pendingAttendance.status === 'absent' ? 'destructive' : 'default',
       });
+      setPendingAttendance(null);
+      setAttendanceEntry(null);
     }
-    setAttendanceEntry(null);
   };
 
   /** Attendance already recorded for this entry's session date this week. */
@@ -118,17 +132,36 @@ export default function CalendarPage() {
   };
 
   const handleEditClick = (entry: ScheduleEntry) => {
-    const existing = schedule.find(e => e.id === entry.id);
-    if (existing && existing.isActive !== entry.isActive) {
-      updateEntry(entry.id, { isActive: entry.isActive, updatedBy: displayedCoachName });
-      toast({
-        title: entry.isActive ? 'Murid Diaktifkan' : 'Murid Dinonaktifkan',
-        description: `${entry.studentName} kini berstatus ${entry.isActive ? 'Aktif' : 'Nonaktif'}.`,
-      });
-      return;
-    }
     setEditingEntry(entry);
     setDialogOpen(true);
+  };
+
+  /** Ask before flipping a student between active and inactive. */
+  const [activeToggleEntry, setActiveToggleEntry] = useState<ScheduleEntry | null>(null);
+
+  const handleToggleActiveClick = (entry: ScheduleEntry) => {
+    setActiveToggleEntry(entry);
+  };
+
+  const handleConfirmToggleActive = async () => {
+    if (!activeToggleEntry) return;
+    const nextActive = !activeToggleEntry.isActive;
+    // A pending student keeps its pending status; only active/inactive flips.
+    const updates: Partial<Omit<ScheduleEntry, 'id'>> = {
+      isActive: nextActive,
+      updatedBy: displayedCoachName,
+    };
+    if (activeToggleEntry.status !== 'pending') {
+      updates.status = nextActive ? 'active' : 'inactive';
+    }
+    const ok = await updateEntry(activeToggleEntry.id, updates);
+    if (ok) {
+      toast({
+        title: nextActive ? 'Murid Diaktifkan' : 'Murid Dinonaktifkan',
+        description: `${activeToggleEntry.studentName} kini berstatus ${nextActive ? 'Aktif' : 'Nonaktif'}.`,
+      });
+      setActiveToggleEntry(null);
+    }
   };
 
   const handleDeleteClick = (id: string) => {
@@ -139,21 +172,34 @@ export default function CalendarPage() {
     }
   };
 
+  /** A save is staged in the form, confirmed, then written. */
+  const [pendingSave, setPendingSave] = useState<Omit<ScheduleEntry, 'id'> | null>(null);
+
   const handleSave = (data: Omit<ScheduleEntry, 'id'>) => {
+    setPendingSave(data);
+  };
+
+  const handleConfirmSave = async () => {
+    if (!pendingSave) return;
     const adminName = displayedCoachName;
-    const auditData = { ...data, updatedBy: adminName };
-    if (editingEntry) {
-      updateEntry(editingEntry.id, auditData);
-      toast({ title: 'Berhasil!', description: `Jadwal ${data.studentName} berhasil diperbarui oleh ${adminName}.` });
-    } else {
-      addEntry(auditData);
-      toast({ title: 'Berhasil!', description: `Jadwal ${data.studentName} berhasil ditambahkan oleh ${adminName}.` });
+    const auditData = { ...pendingSave, updatedBy: adminName };
+    const ok = editingEntry
+      ? await updateEntry(editingEntry.id, auditData)
+      : await addEntry(auditData);
+    if (ok) {
+      toast({
+        title: 'Berhasil!',
+        description: `Jadwal ${pendingSave.studentName} berhasil ${editingEntry ? 'diperbarui' : 'ditambahkan'} oleh ${adminName}.`,
+      });
+      setPendingSave(null);
+      setEditingEntry(null);
     }
   };
 
-  const handleConfirmDelete = () => {
-    if (deletingEntry) {
-      deleteEntry(deletingEntry.id);
+  const handleConfirmDelete = async () => {
+    if (!deletingEntry) return;
+    const ok = await deleteEntry(deletingEntry.id);
+    if (ok) {
       toast({ title: 'Dihapus', description: `Jadwal ${deletingEntry.studentName} berhasil dihapus.`, variant: 'destructive' });
       setDeletingEntry(null);
     }
@@ -287,6 +333,7 @@ export default function CalendarPage() {
                 onEditEntry={handleEditClick}
                 onDeleteEntry={handleDeleteClick}
                 onAttendanceEntry={handleAttendanceClick}
+                onToggleActive={handleToggleActiveClick}
                 getAttendanceStatus={getAttendanceStatus}
                 hasActiveFilter={hasActiveFilter}
               />
@@ -358,6 +405,53 @@ export default function CalendarPage() {
         onOpenChange={setAttendanceDialogOpen}
         entry={attendanceEntry}
         onSubmit={handleAttendanceSubmit}
+      />
+
+      {/* ── Confirmations ── every schedule action asks before it acts ── */}
+
+      <ConfirmDialog
+        open={!!pendingSave}
+        onOpenChange={(open) => { if (!open) { setPendingSave(null); } }}
+        onConfirm={handleConfirmSave}
+        title={editingEntry ? 'Simpan Perubahan Jadwal?' : 'Tambah Jadwal Baru?'}
+        description={
+          pendingSave
+            ? `${editingEntry ? 'Perbarui' : 'Tambahkan'} jadwal ${pendingSave.studentName} - ${pendingSave.coach}, ${pendingSave.day} ${pendingSave.time}?`
+            : undefined
+        }
+        confirmLabel={editingEntry ? 'Simpan Perubahan' : 'Tambah Jadwal'}
+      />
+
+      <ConfirmDialog
+        open={!!pendingAttendance}
+        onOpenChange={(open) => { if (!open) { setPendingAttendance(null); setAttendanceEntry(null); } }}
+        onConfirm={handleConfirmAttendance}
+        tone={pendingAttendance?.status === 'absent' ? 'destructive' : 'default'}
+        title={pendingAttendance?.status === 'absent' ? 'Catat Tidak Hadir?' : 'Catat Kehadiran?'}
+        description={
+          attendanceEntry && pendingAttendance
+            ? pendingAttendance.status === 'absent'
+              ? `${attendanceEntry.studentName} akan dicatat TIDAK HADIR${pendingAttendance.reason ? ` dengan alasan ${pendingAttendance.reason}` : ''}.`
+              : `${attendanceEntry.studentName} akan dicatat HADIR.`
+            : undefined
+        }
+        confirmLabel={pendingAttendance?.status === 'absent' ? 'Catat Tidak Hadir' : 'Catat Hadir'}
+      />
+
+      <ConfirmDialog
+        open={!!activeToggleEntry}
+        onOpenChange={(open) => { if (!open) setActiveToggleEntry(null); }}
+        onConfirm={handleConfirmToggleActive}
+        tone={activeToggleEntry?.isActive ? 'destructive' : 'default'}
+        title={activeToggleEntry?.isActive ? 'Nonaktifkan Murid?' : 'Aktifkan Murid?'}
+        description={
+          activeToggleEntry
+            ? activeToggleEntry.isActive
+              ? `${activeToggleEntry.studentName} akan dinonaktifkan dan disembunyikan dari jadwal aktif.`
+              : `${activeToggleEntry.studentName} akan diaktifkan kembali dan tampil di jadwal aktif.`
+            : undefined
+        }
+        confirmLabel={activeToggleEntry?.isActive ? 'Nonaktifkan' : 'Aktifkan'}
       />
     </>
   );

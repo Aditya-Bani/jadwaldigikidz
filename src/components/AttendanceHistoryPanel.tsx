@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { EmptyState } from '@/components/EmptyState';
+import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { cn } from '@/lib/utils';
 import {
   useAttendance,
@@ -36,6 +37,8 @@ export function AttendanceHistoryPanel() {
   const { records, loading, removeRecord } = useAttendance();
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [search, setSearch] = useState('');
+  /** Record staged for deletion, pending confirmation. */
+  const [pendingDelete, setPendingDelete] = useState<AttendanceRecord | null>(null);
 
   const stats = useMemo(() => {
     const absent = records.filter((r) => r.status === 'absent').length;
@@ -122,11 +125,28 @@ export function AttendanceHistoryPanel() {
             <AttendanceRow
               key={record.id}
               record={record}
-              onRemove={() => removeRecord(record.id)}
+              onRemove={() => setPendingDelete(record)}
             />
           ))}
         </div>
       )}
+
+      <ConfirmDialog
+        open={!!pendingDelete}
+        onOpenChange={(open) => { if (!open) setPendingDelete(null); }}
+        onConfirm={() => {
+          if (pendingDelete) removeRecord(pendingDelete.id);
+          setPendingDelete(null);
+        }}
+        tone="destructive"
+        title="Hapus Catatan Kehadiran?"
+        description={
+          pendingDelete
+            ? `Catatan ${pendingDelete.status === 'absent' ? 'tidak hadir' : 'hadir'} untuk ${pendingDelete.studentName} akan dihapus.`
+            : undefined
+        }
+        confirmLabel="Hapus"
+      />
     </div>
   );
 }
