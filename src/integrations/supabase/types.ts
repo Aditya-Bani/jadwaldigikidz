@@ -14,6 +14,54 @@ export type Database = {
   }
   public: {
     Tables: {
+      attendance_records: {
+        Row: {
+          coach: string
+          created_at: string
+          day: string
+          id: string
+          level: string
+          note: string | null
+          reason: string | null
+          recorded_by: string | null
+          schedule_entry_id: string | null
+          session_date: string
+          status: string
+          student_name: string
+          time: string
+        }
+        Insert: {
+          coach: string
+          created_at?: string
+          day: string
+          id?: string
+          level: string
+          note?: string | null
+          reason?: string | null
+          recorded_by?: string | null
+          schedule_entry_id?: string | null
+          session_date: string
+          status: string
+          student_name: string
+          time: string
+        }
+        Update: {
+          coach?: string
+          created_at?: string
+          day?: string
+          id?: string
+          level?: string
+          note?: string | null
+          reason?: string | null
+          recorded_by?: string | null
+          schedule_entry_id?: string | null
+          session_date?: string
+          status?: string
+          student_name?: string
+          time?: string
+        }
+        Relationships: []
+      }
       activity_reports: {
         Row: {
           activity_report_text: string | null

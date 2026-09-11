@@ -1,12 +1,16 @@
 import { ScheduleEntry as ScheduleEntryType } from '@/types/schedule';
 import { cn } from '@/lib/utils';
-import { Pencil, Trash2, Power, Tent, Sparkles, Clock } from 'lucide-react';
+import { Pencil, Trash2, Power, Tent, Sparkles, Clock, CalendarCheck, CalendarX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { AttendanceStatus } from '@/hooks/useAttendance';
 
 interface ScheduleEntryProps {
   entry: ScheduleEntryType;
   onEdit: (entry: ScheduleEntryType) => void;
   onDelete: (id: string) => void;
+  onAttendance: (entry: ScheduleEntryType) => void;
+  /** Attendance already recorded for this entry's current session date. */
+  attendanceStatus?: AttendanceStatus;
 }
 
 function getLevelClass(level: string): string {
@@ -17,7 +21,7 @@ function getLevelClass(level: string): string {
   return '';
 }
 
-export function ScheduleEntryCard({ entry, onEdit, onDelete }: ScheduleEntryProps) {
+export function ScheduleEntryCard({ entry, onEdit, onDelete, onAttendance, attendanceStatus }: ScheduleEntryProps) {
   const coachClass =
     entry.coach === 'Mr. Bani'
       ? 'coach-bani'
@@ -72,6 +76,16 @@ export function ScheduleEntryCard({ entry, onEdit, onDelete }: ScheduleEntryProp
           </p>
           <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
             <p className="text-[10px] font-bold text-muted-foreground/80 uppercase tracking-wider">{entry.coach}</p>
+            {attendanceStatus === 'present' && (
+              <span className="inline-flex items-center gap-1 text-[9px] font-bold text-emerald-700 bg-emerald-100/80 dark:text-emerald-300 dark:bg-emerald-950/60 px-1.5 py-0.5 rounded-md tracking-wider border border-emerald-300/60 dark:border-emerald-700/60">
+                <CalendarCheck className="w-2.5 h-2.5" /> HADIR
+              </span>
+            )}
+            {attendanceStatus === 'absent' && (
+              <span className="inline-flex items-center gap-1 text-[9px] font-bold text-rose-700 bg-rose-100/80 dark:text-rose-300 dark:bg-rose-950/60 px-1.5 py-0.5 rounded-md tracking-wider border border-rose-300/60 dark:border-rose-700/60">
+                <CalendarX className="w-2.5 h-2.5" /> TIDAK HADIR
+              </span>
+            )}
             {entry.isHolidayCamp && (
               <span className="inline-flex items-center gap-1 text-[9px] font-bold text-amber-700 bg-amber-100/80 dark:text-amber-300 dark:bg-amber-950/60 px-1.5 py-0.5 rounded-md tracking-wider border border-amber-300/60 dark:border-amber-700/60">
                 <Tent className="w-2.5 h-2.5 text-amber-600" /> CAMP
@@ -110,6 +124,25 @@ export function ScheduleEntryCard({ entry, onEdit, onDelete }: ScheduleEntryProp
         </div>
 
         <div className="flex flex-col gap-1.5 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all duration-200 transform translate-x-0 sm:translate-x-2 sm:group-hover:translate-x-0">
+          <Button
+            variant="secondary"
+            size="icon"
+            title="Catat Kehadiran"
+            className={cn(
+              "h-7 w-7 rounded-lg bg-background/80 backdrop-blur-sm shadow-sm border-none",
+              attendanceStatus === 'present' && "bg-emerald-500 text-white hover:bg-emerald-600",
+              attendanceStatus === 'absent' && "bg-rose-500 text-white hover:bg-rose-600",
+              !attendanceStatus && "hover:bg-sky-500 hover:text-white",
+            )}
+            onClick={(e) => {
+              e.stopPropagation();
+              onAttendance(entry);
+            }}
+          >
+            {attendanceStatus === 'absent'
+              ? <CalendarX className="h-3.5 w-3.5" />
+              : <CalendarCheck className="h-3.5 w-3.5" />}
+          </Button>
           <Button
             variant="secondary"
             size="icon"

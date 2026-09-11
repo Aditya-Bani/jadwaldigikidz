@@ -5,8 +5,10 @@ import { useSchedule } from '@/hooks/useSchedule';
 import { ScheduleGrid } from '@/components/ScheduleGrid';
 import { ScheduleDialog } from '@/components/ScheduleDialog';
 import { DeleteConfirmDialog } from '@/components/DeleteConfirmDialog';
+import { AttendanceDialog } from '@/components/AttendanceDialog';
+import { AttendanceHistoryPanel } from '@/components/AttendanceHistoryPanel';
 import { ScheduleEntry, DayOfWeek, TimeSlot, Coach, COACHES } from '@/types/schedule';
-import { X, Eye, EyeOff, User, GraduationCap, Plus, CalendarDays } from 'lucide-react';
+import { X, Eye, EyeOff, User, GraduationCap, Plus, CalendarDays, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
@@ -14,9 +16,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAuth } from '@/hooks/useAuth';
 import { getDisplayName } from '@/lib/displayNames';
+import { useAttendance, AttendanceStatus } from '@/hooks/useAttendance';
+import { sessionDateForDay } from '@/lib/sessionDate';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export default function CalendarPage() {
   const { schedule, loading: scheduleLoading, addEntry, updateEntry, deleteEntry, getEntriesForCell } = useSchedule();
+  const { markAttendance, getRecordFor } = useAttendance();
   const { user } = useAuth();
   const { toast } = useToast();
   const displayedCoachName = user?.user_metadata?.full_name || getDisplayName(user?.email || '') || 'Coach';
@@ -56,6 +62,53 @@ export default function CalendarPage() {
 
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deletingEntry, setDeletingEntry] = useState<ScheduleEntry | null>(null);
+
+  const [attendanceDialogOpen, setAttendanceDialogOpen] = useState(false);
+  const [attendanceEntry, setAttendanceEntry] = useState<ScheduleEntry | null>(null);
+
+  const handleAttendanceClick = (entry: ScheduleEntry) => {
+    setAttendanceEntry(entry);
+    setAttendanceDialogOpen(true);
+  };
+
+  const handleAttendanceSubmit = async (data: {
+    status: AttendanceStatus;
+    reason?: string;
+    note?: string;
+    sessionDate: string;
+  }) => {
+    if (!attendanceEntry) return;
+    const ok = await markAttendance({
+      scheduleEntryId: attendanceEntry.id,
+      studentName: attendanceEntry.studentName,
+      coach: attendanceEntry.coach,
+      level: attendanceEntry.level,
+      day: attendanceEntry.day,
+      time: attendanceEntry.time,
+      sessionDate: data.sessionDate,
+      status: data.status,
+      reason: data.reason,
+      note: data.note,
+      recordedBy: displayedCoachName,
+    });
+    if (ok) {
+      toast({
+        title: data.status === 'absent' ? 'Tidak Hadir Dicatat' : 'Kehadiran Dicatat',
+        description: `${attendanceEntry.studentName} ${data.status === 'absent' ? 'tidak hadir' : 'hadir'}${data.reason ? ` - ${data.reason}` : ''}.`,
+        variant: data.status === 'absent' ? 'destructive' : 'default',
+      });
+    }
+    setAttendanceEntry(null);
+  };
+
+  /** Attendance already recorded for this entry's session date this week. */
+  const getAttendanceStatus = useCallback(
+    (entry: ScheduleEntry): AttendanceStatus | undefined => {
+      const record = getRecordFor(entry.id, sessionDateForDay(entry.day));
+      return record?.status;
+    },
+    [getRecordFor]
+  );
 
   const handleAddClick = (day: DayOfWeek, time: TimeSlot) => {
     setEditingEntry(null);
@@ -206,24 +259,47 @@ export default function CalendarPage() {
         </div>
       </div>
 
-      {/* ── Schedule Grid ── */}
-      {scheduleLoading ? (
-        <div className="ai-card p-6">
-          {[...Array(5)].map((_, i) => (
-            <Skeleton key={i} className="h-14 w-full rounded-xl mb-3" />
-          ))}
-        </div>
-      ) : (
-        <div className="ai-card overflow-hidden">
-          <ScheduleGrid
-            getEntriesForCell={filteredGetEntriesForCell}
-            onAddEntry={handleAddClick}
-            onEditEntry={handleEditClick}
-            onDeleteEntry={handleDeleteClick}
-            hasActiveFilter={hasActiveFilter}
-          />
-        </div>
-      )}
+      {/* ── Schedule Grid + Attendance History ── */}
+      <Tabs defaultValue="jadwal" className="w-full">
+        <TabsList className="mb-4 w-full sm:w-auto">
+          <TabsTrigger value="jadwal" className="gap-1.5 flex-1 sm:flex-initial">
+            <CalendarDays className="h-4 w-4" />
+            Jadwal
+          </TabsTrigger>
+          <TabsTrigger value="kehadiran" className="gap-1.5 flex-1 sm:flex-initial">
+            <Clock className="h-4 w-4" />
+            Riwayat Kehadiran
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="jadwal" className="mt-0">
+          {scheduleLoading ? (
+            <div className="ai-card p-6">
+              {[...Array(5)].map((_, i) => (
+                <Skeleton key={i} className="h-14 w-full rounded-xl mb-3" />
+              ))}
+            </div>
+          ) : (
+            <div className="ai-card overflow-hidden">
+              <ScheduleGrid
+                getEntriesForCell={filteredGetEntriesForCell}
+                onAddEntry={handleAddClick}
+                onEditEntry={handleEditClick}
+                onDeleteEntry={handleDeleteClick}
+                onAttendanceEntry={handleAttendanceClick}
+                getAttendanceStatus={getAttendanceStatus}
+                hasActiveFilter={hasActiveFilter}
+              />
+            </div>
+          )}
+        </TabsContent>
+
+        <TabsContent value="kehadiran" className="mt-0">
+          <div className="ai-card p-4 sm:p-6">
+            <AttendanceHistoryPanel />
+          </div>
+        </TabsContent>
+      </Tabs>
 
       {/* ── Clean Legend ── */}
       <div className="mt-4 flex flex-wrap items-center justify-between gap-3 sm:gap-6 p-4 rounded-2xl ai-card text-xs">
@@ -275,6 +351,13 @@ export default function CalendarPage() {
         onOpenChange={setDeleteDialogOpen}
         onConfirm={handleConfirmDelete}
         studentName={deletingEntry?.studentName}
+      />
+
+      <AttendanceDialog
+        open={attendanceDialogOpen}
+        onOpenChange={setAttendanceDialogOpen}
+        entry={attendanceEntry}
+        onSubmit={handleAttendanceSubmit}
       />
     </>
   );

@@ -5,12 +5,16 @@ import { EmptyState } from './EmptyState';
 import { cn } from '@/lib/utils';
 import { Plus, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { AttendanceStatus } from '@/hooks/useAttendance';
 
 interface ScheduleGridProps {
   getEntriesForCell: (day: DayOfWeek, time: TimeSlot) => ScheduleEntry[];
   onAddEntry: (day: DayOfWeek, time: TimeSlot) => void;
   onEditEntry: (entry: ScheduleEntry) => void;
   onDeleteEntry: (id: string) => void;
+  onAttendanceEntry: (entry: ScheduleEntry) => void;
+  /** Attendance status for an entry's current session date, when recorded. */
+  getAttendanceStatus?: (entry: ScheduleEntry) => AttendanceStatus | undefined;
   hasActiveFilter?: boolean;
 }
 
@@ -18,7 +22,7 @@ interface ScheduleGridProps {
 
 /* ─── DESKTOP GRID VIEW ───────────────────────────────────────────────────── */
 
-function DesktopGrid({ getEntriesForCell, onAddEntry, onEditEntry, onDeleteEntry, hasActiveFilter }: ScheduleGridProps) {
+function DesktopGrid({ getEntriesForCell, onAddEntry, onEditEntry, onDeleteEntry, onAttendanceEntry, getAttendanceStatus, hasActiveFilter }: ScheduleGridProps) {
   const JS_DAY_MAP: Record<number, DayOfWeek> = { 1: 'senin', 2: 'selasa', 3: 'rabu', 4: 'kamis', 5: 'jumat', 6: 'sabtu', 0: 'minggu' };
   const todayKey = JS_DAY_MAP[new Date().getDay()];
 
@@ -80,6 +84,8 @@ function DesktopGrid({ getEntriesForCell, onAddEntry, onEditEntry, onDeleteEntry
                       entry={entry}
                       onEdit={onEditEntry}
                       onDelete={onDeleteEntry}
+                      onAttendance={onAttendanceEntry}
+                      attendanceStatus={getAttendanceStatus?.(entry)}
                     />
                   ))}
                   <Button
@@ -103,7 +109,7 @@ function DesktopGrid({ getEntriesForCell, onAddEntry, onEditEntry, onDeleteEntry
 
 /* ─── MOBILE LIST VIEW (per hari) ────────────────────────────────────────── */
 
-function MobileDayView({ day, getEntriesForCell, onAddEntry, onEditEntry, onDeleteEntry }: ScheduleGridProps & { day: DayOfWeek }) {
+function MobileDayView({ day, getEntriesForCell, onAddEntry, onEditEntry, onDeleteEntry, onAttendanceEntry, getAttendanceStatus }: ScheduleGridProps & { day: DayOfWeek }) {
   const slotsWithEntries = TIME_SLOTS.map((time) => ({
     time,
     entries: getEntriesForCell(day, time),
@@ -126,6 +132,8 @@ function MobileDayView({ day, getEntriesForCell, onAddEntry, onEditEntry, onDele
                   entry={entry}
                   onEdit={onEditEntry}
                   onDelete={onDeleteEntry}
+                  onAttendance={onAttendanceEntry}
+                  attendanceStatus={getAttendanceStatus?.(entry)}
                 />
               ))
             ) : null}
@@ -148,7 +156,7 @@ function MobileDayView({ day, getEntriesForCell, onAddEntry, onEditEntry, onDele
   );
 }
 
-function MobileView({ getEntriesForCell, onAddEntry, onEditEntry, onDeleteEntry, hasActiveFilter }: ScheduleGridProps) {
+function MobileView({ getEntriesForCell, onAddEntry, onEditEntry, onDeleteEntry, onAttendanceEntry, getAttendanceStatus, hasActiveFilter }: ScheduleGridProps) {
   // Map system day (0-6, 0 is Sun) to DAYS index (0-5)
   // 1 (Mon) -> 0, 2 (Tue) -> 1, ..., 6 (Sat) -> 5, 0 (Sun) -> 0
   const getTodayIndex = () => {
@@ -248,6 +256,8 @@ function MobileView({ getEntriesForCell, onAddEntry, onEditEntry, onDeleteEntry,
           onAddEntry={onAddEntry}
           onEditEntry={onEditEntry}
           onDeleteEntry={onDeleteEntry}
+          onAttendanceEntry={onAttendanceEntry}
+          getAttendanceStatus={getAttendanceStatus}
         />
       )}
     </div>
