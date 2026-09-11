@@ -164,7 +164,7 @@ function ReportCard({ r, onEdit, onDelete, schedule = [] }: ReportCardProps) {
 
       <button
         onClick={() => onDelete(r.id, r.studentName)}
-        className="absolute top-2 right-2 p-1.5 rounded-lg text-red-400 hover:bg-red-50 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity"
+        className="absolute top-2 right-2 p-1.5 rounded-lg text-muted-foreground/50 hover:bg-destructive/10 hover:text-destructive transition-colors"
       >
         <Trash2 className="w-4 h-4" />
       </button>
@@ -779,9 +779,9 @@ export default function ReportsAdminPage() {
                           <p className="font-bold text-sm truncate">{c.studentName}</p>
                           <p className="text-xs text-primary font-mono font-bold tracking-widest mt-0.5 uppercase">{c.accessCode}</p>
                         </div>
-                        <div className="flex gap-1 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity">
-                          <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg hover:bg-primary/10 hover:text-primary" onClick={() => copyCode(c.accessCode)}><Copy className="h-4 w-4" /></Button>
-                          <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg hover:bg-destructive/10 hover:text-destructive" onClick={() => deleteCode(c.id)}><Trash2 className="h-4 w-4" /></Button>
+                        <div className="flex gap-1">
+                          <Button variant="ghost" size="icon" title="Salin kode akses" aria-label="Salin kode akses" className="h-8 w-8 rounded-lg hover:bg-primary/10 hover:text-primary" onClick={() => copyCode(c.accessCode)}><Copy className="h-4 w-4" /></Button>
+                          <Button variant="ghost" size="icon" title="Hapus kode akses" aria-label="Hapus kode akses" className="h-8 w-8 rounded-lg hover:bg-destructive/10 hover:text-destructive" onClick={() => deleteCode(c.id)}><Trash2 className="h-4 w-4" /></Button>
                         </div>
                       </div>
                     ))}

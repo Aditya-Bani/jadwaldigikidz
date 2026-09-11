@@ -11,8 +11,8 @@
 @layer base {
   :root {
     /* ── Core Background ── */
-    --background: #f7f9fb;
-    --on-background: #191c1e;
+    --background: 210 33% 98%;
+    --on-background: 204 9% 11%;
     --foreground: 222 47% 11%;
 
     /* ── Card / Surface ── */
@@ -22,62 +22,62 @@
     --popover-foreground: 222 47% 11%;
 
     /* ── Primary ── */
-    --primary: #004ac6;
-    --on-primary: #ffffff;
+    --primary: 218 100% 39%;
+    --on-primary: 0 0% 100%;
     --primary-foreground: 210 40% 98%;
-    --primary-container: #2563eb;
-    --on-primary-container: #eeefff;
+    --primary-container: 221 83% 53%;
+    --on-primary-container: 236 100% 97%;
 
     /* ── Secondary ── */
-    --secondary: #9d4300;
-    --on-secondary: #ffffff;
+    --secondary: 26 100% 31%;
+    --on-secondary: 0 0% 100%;
     --secondary-foreground: 222 47% 11%;
-    --secondary-container: #fd761a;
-    --on-secondary-container: #5c2400;
+    --secondary-container: 24 98% 55%;
+    --on-secondary-container: 23 100% 18%;
 
     /* ── Tertiary ── */
-    --tertiary: #006229;
-    --on-tertiary: #ffffff;
-    --tertiary-container: #007e37;
-    --on-tertiary-container: #c1ffc5;
+    --tertiary: 145 100% 19%;
+    --on-tertiary: 0 0% 100%;
+    --tertiary-container: 146 100% 25%;
+    --on-tertiary-container: 124 100% 88%;
 
     /* ── Surface Tokens ── */
-    --surface: #f7f9fb;
-    --surface-dim: #d8dadc;
-    --surface-bright: #f7f9fb;
-    --surface-container-lowest: #ffffff;
-    --surface-container-low: #f2f4f6;
-    --surface-container: #eceef0;
-    --surface-container-high: #e6e8ea;
-    --surface-container-highest: #e0e3e5;
-    --on-surface: #191c1e;
-    --on-surface-variant: #434655;
-    --inverse-surface: #2d3133;
-    --inverse-on-surface: #eff1f3;
-    --surface-tint: #0053db;
-    --surface-variant: #e0e3e5;
+    --surface: 210 33% 98%;
+    --surface-dim: 210 5% 85%;
+    --surface-bright: 210 33% 98%;
+    --surface-container-lowest: 0 0% 100%;
+    --surface-container-low: 210 18% 96%;
+    --surface-container: 210 12% 93%;
+    --surface-container-high: 210 9% 91%;
+    --surface-container-highest: 204 9% 89%;
+    --on-surface: 204 9% 11%;
+    --on-surface-variant: 230 12% 30%;
+    --inverse-surface: 200 6% 19%;
+    --inverse-on-surface: 210 14% 95%;
+    --surface-tint: 217 100% 43%;
+    --surface-variant: 204 9% 89%;
 
     /* ── Outline & State ── */
-    --outline: #737686;
-    --outline-variant: #c3c6d7;
-    --error: #ba1a1a;
-    --on-error: #ffffff;
-    --error-container: #ffdad6;
-    --on-error-container: #93000a;
+    --outline: 231 8% 49%;
+    --outline-variant: 231 20% 80%;
+    --error: 0 75% 42%;
+    --on-error: 0 0% 100%;
+    --error-container: 6 100% 92%;
+    --on-error-container: 356 100% 29%;
     
     /* ── Fixed Colors ── */
-    --primary-fixed: #dbe1ff;
-    --primary-fixed-dim: #b4c5ff;
-    --on-primary-fixed: #00174b;
-    --on-primary-fixed-variant: #003ea8;
-    --secondary-fixed: #ffdbca;
-    --secondary-fixed-dim: #ffb690;
-    --on-secondary-fixed: #341100;
-    --on-secondary-fixed-variant: #783200;
-    --tertiary-fixed: #6bff8f;
-    --tertiary-fixed-dim: #4ae176;
-    --on-tertiary-fixed: #002109;
-    --on-tertiary-fixed-variant: #005321;
+    --primary-fixed: 230 100% 93%;
+    --primary-fixed-dim: 226 100% 85%;
+    --on-primary-fixed: 222 100% 15%;
+    --on-primary-fixed-variant: 218 100% 33%;
+    --secondary-fixed: 19 100% 90%;
+    --secondary-fixed-dim: 21 100% 78%;
+    --on-secondary-fixed: 20 100% 10%;
+    --on-secondary-fixed-variant: 25 100% 24%;
+    --tertiary-fixed: 135 100% 71%;
+    --tertiary-fixed-dim: 137 72% 59%;
+    --on-tertiary-fixed: 136 100% 6%;
+    --on-tertiary-fixed-variant: 144 100% 16%;
 
     /* ── Others ── */
     --muted: 214 32% 91%;
@@ -458,6 +458,40 @@
 
 /* Smooth scroll */
 html { scroll-behavior: smooth; }
+
+/* ============================================================
+   MISSING UTILITIES
+   ============================================================ */
+
+/* Horizontal filter/tab strips: keep scrolling, hide the bar. */
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Gentle idle float for mascot illustrations. */
+@keyframes bounce-subtle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+.animate-bounce-subtle {
+  animation: bounce-subtle 3s ease-in-out infinite;
+}
+
+/* Respect users who ask the OS to reduce motion. */
+@media (prefers-reduced-motion: reduce) {
+  .animate-bounce-subtle,
+  .animate-fade-in,
+  .animate-slide-up,
+  .animate-scale-in,
+  .skeleton-shimmer {
+    animation: none !important;
+  }
+  html { scroll-behavior: auto; }
+}
 
 /* Card hover lift */
 .card-hover { transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease; }

@@ -165,15 +165,15 @@ export default function CalendarPage() {
       <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl mb-6 flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4 p-5 sm:p-6 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 shadow-sm">
         {/* Left: title + live time */}
         <div className="flex items-center gap-4 z-10">
-          <div className="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-950/50 border border-blue-100 dark:border-blue-900/50 flex items-center justify-center flex-shrink-0">
-            <CalendarDays className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+          <div className="w-12 h-12 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center flex-shrink-0">
+            <CalendarDays className="w-6 h-6 text-primary" />
           </div>
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">
                 Jadwal Mingguan
               </h1>
-              <Badge variant="outline" className="text-[10px] bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800">
+              <Badge variant="outline" className="text-[10px] bg-primary/10 text-primary border-primary/20">
                 Interactive Grid
               </Badge>
             </div>
@@ -251,7 +251,7 @@ export default function CalendarPage() {
               setDefaultTime('08:00');
               setDialogOpen(true);
             }}
-            className="w-full sm:w-auto flex items-center justify-center gap-1.5 rounded-xl px-4 py-2 text-xs sm:text-sm font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition-all active:scale-95"
+            className="w-full sm:w-auto flex items-center justify-center gap-1.5 rounded-xl px-4 h-10 text-xs sm:text-sm font-bold bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm shadow-primary/20 transition-all active:scale-95"
           >
             <Plus className="w-4 h-4" />
             <span>Tambah Jadwal</span>
@@ -308,15 +308,15 @@ export default function CalendarPage() {
             Coach:
           </span>
           <div className="flex items-center gap-1.5">
-            <div className="w-2.5 h-2.5 rounded-full bg-blue-500 ring-2 ring-blue-500/20" />
+            <div className="w-2.5 h-2.5 rounded-full bg-coach-bani ring-2 ring-coach-bani/20" />
             <span className="font-semibold text-slate-700 dark:text-slate-300">Mr. Bani</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <div className="w-2.5 h-2.5 rounded-full bg-purple-500 ring-2 ring-purple-500/20" />
+            <div className="w-2.5 h-2.5 rounded-full bg-coach-argy ring-2 ring-coach-argy/20" />
             <span className="font-semibold text-slate-700 dark:text-slate-300">Mr. Argy</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <div className="w-2.5 h-2.5 rounded-full bg-rose-500 ring-2 ring-rose-500/20" />
+            <div className="w-2.5 h-2.5 rounded-full bg-coach-zaura ring-2 ring-coach-zaura/20" />
             <span className="font-semibold text-slate-700 dark:text-slate-300">Ms. Zaura</span>
           </div>
         </div>

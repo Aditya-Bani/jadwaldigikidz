@@ -123,13 +123,13 @@ export function ScheduleEntryCard({ entry, onEdit, onDelete, onAttendance, atten
           )}
         </div>
 
-        <div className="flex flex-col gap-1.5 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all duration-200 transform translate-x-0 sm:translate-x-2 sm:group-hover:translate-x-0">
+        <div className="flex flex-col gap-1.5 transition-opacity duration-200">
           <Button
             variant="secondary"
             size="icon"
             title="Catat Kehadiran"
             className={cn(
-              "h-7 w-7 rounded-lg bg-background/80 backdrop-blur-sm shadow-sm border-none",
+              "h-8 w-8 sm:h-7 sm:w-7 rounded-lg bg-background/80 backdrop-blur-sm shadow-sm border-none",
               attendanceStatus === 'present' && "bg-emerald-500 text-white hover:bg-emerald-600",
               attendanceStatus === 'absent' && "bg-rose-500 text-white hover:bg-rose-600",
               !attendanceStatus && "hover:bg-sky-500 hover:text-white",
@@ -140,42 +140,46 @@ export function ScheduleEntryCard({ entry, onEdit, onDelete, onAttendance, atten
             }}
           >
             {attendanceStatus === 'absent'
-              ? <CalendarX className="h-3.5 w-3.5" />
-              : <CalendarCheck className="h-3.5 w-3.5" />}
+              ? <CalendarX className="h-4 w-4 sm:h-3.5 sm:w-3.5" />
+              : <CalendarCheck className="h-4 w-4 sm:h-3.5 sm:w-3.5" />}
           </Button>
           <Button
             variant="secondary"
             size="icon"
             title={entry.isActive ? "Nonaktifkan Murid" : "Aktifkan Murid"}
-            className={cn("h-7 w-7 rounded-lg bg-background/80 backdrop-blur-sm shadow-sm border-none hover:text-white", entry.isActive ? "hover:bg-amber-500" : "hover:bg-emerald-500 text-slate-400")}
+            className={cn("h-8 w-8 sm:h-7 sm:w-7 rounded-lg bg-background/80 backdrop-blur-sm shadow-sm border-none hover:text-white", entry.isActive ? "hover:bg-amber-500" : "hover:bg-emerald-500 text-slate-400")}
             onClick={(e) => {
               e.stopPropagation();
               onEdit({ ...entry, isActive: !entry.isActive });
             }}
           >
-            <Power className="h-3.5 w-3.5" />
+            <Power className="h-4 w-4 sm:h-3.5 sm:w-3.5" />
           </Button>
           <Button
             variant="secondary"
             size="icon"
-            className="h-7 w-7 rounded-lg bg-background/80 backdrop-blur-sm shadow-sm border-none hover:bg-primary hover:text-white"
+            title="Edit Jadwal"
+            aria-label="Edit jadwal murid"
+            className="h-8 w-8 sm:h-7 sm:w-7 rounded-lg bg-background/80 backdrop-blur-sm shadow-sm border-none hover:bg-primary hover:text-white"
             onClick={(e) => {
               e.stopPropagation();
               onEdit(entry);
             }}
           >
-            <Pencil className="h-3.5 w-3.5" />
+            <Pencil className="h-4 w-4 sm:h-3.5 sm:w-3.5" />
           </Button>
           <Button
             variant="secondary"
             size="icon"
-            className="h-7 w-7 rounded-lg bg-background/80 backdrop-blur-sm shadow-sm border-none hover:bg-destructive hover:text-white"
+            title="Hapus Jadwal"
+            aria-label="Hapus jadwal murid"
+            className="h-8 w-8 sm:h-7 sm:w-7 rounded-lg bg-background/80 backdrop-blur-sm shadow-sm border-none hover:bg-destructive hover:text-white"
             onClick={(e) => {
               e.stopPropagation();
               onDelete(entry.id);
             }}
           >
-            <Trash2 className="h-3.5 w-3.5" />
+            <Trash2 className="h-4 w-4 sm:h-3.5 sm:w-3.5" />
           </Button>
         </div>
       </div>

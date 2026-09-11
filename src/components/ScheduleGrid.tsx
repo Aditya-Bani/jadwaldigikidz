@@ -91,7 +91,7 @@ function DesktopGrid({ getEntriesForCell, onAddEntry, onEditEntry, onDeleteEntry
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="w-full h-8 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-primary"
+                    className="w-full h-8 text-muted-foreground/60 hover:text-primary hover:bg-primary/5 transition-colors"
                     onClick={() => onAddEntry(day, time)}
                   >
                     <Plus className="h-4 w-4 mr-1" />
